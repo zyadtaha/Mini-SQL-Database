@@ -1,6 +1,7 @@
 import pc from "picocolors";
 import { createTable, insertInto, select } from "../lib/query.js";
 import { createIndex, searchWithIndex } from "../lib/indexing.js";
+import { backupDatabase, restoreDatabase } from "../lib/backup.js";
 import { logger } from "../logger/logger.js";
 
 function createTableTest() {
@@ -61,12 +62,32 @@ function searchWithIndexTest() {
     }
 }
 
+function backupDatabaseTest() {
+    try {
+        backupDatabase("./backup/");
+        logger("[TEST]", pc.magenta, console.info, "Backup DB test passed\n")
+    } catch (error) {
+        logger("[TEST]", pc.red, console.error, "Backup DB test failed\n")
+    }
+}
+
+function restoreDatabaseTest() {
+    try {
+        restoreDatabase("./backup/");
+        logger("[TEST]", pc.magenta, console.info, "Database restoration test passed\n")
+    } catch (error) {
+        logger("[TEST]", pc.red, console.error, "Database restoration test failed\n")
+    }
+}
+
 function main() {
     createTableTest();
     insertIntoTest();
     selectTest();
     createIndexTest();
     searchWithIndexTest();
+    backupDatabaseTest();
+    restoreDatabaseTest();
 }
 
 main();
