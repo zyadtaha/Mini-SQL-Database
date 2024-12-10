@@ -1,6 +1,7 @@
 import pc from "picocolors";
-import { logger } from "../logger/logger.js";
 import { createTable, insertInto, select } from "../lib/query.js";
+import { createIndex, searchWithIndex } from "../lib/indexing.js";
+import { logger } from "../logger/logger.js";
 
 function createTableTest() {
     const query = "CREATE TABLE users (id INT, name TEXT, age INT)";
@@ -14,9 +15,9 @@ function createTableTest() {
 
 function insertIntoTest() {
     const query1 = 'INSERT INTO users (id, name, age) VALUES (13, "Zyad", 19)';
-    const query2 = 'INSERT INTO users (id, name, age) VALUES (1, "Mohmed", 55)';
-    const query3 = 'INSERT INTO users (id, name, age) VALUES (2, "Taha", 106)';
-    const query4 = 'INSERT INTO users (id, name, age) VALUES (99, "Ahmed", 120)';
+    const query2 = 'INSERT INTO users (id, name, age) VALUES (1, "Mohamed", 55)';
+    const query3 = 'INSERT INTO users (id, name, age) VALUES (2, "Zyad", 106)';
+    const query4 = 'INSERT INTO users (id, name, age) VALUES (99, "Ahmed", 19)';
     try {
         insertInto(query1);
         insertInto(query2);
@@ -40,10 +41,32 @@ function selectTest() {
     }
 }
 
+function createIndexTest() {
+    try {
+        createIndex("users", "name");
+        createIndex("users", "age");
+        logger("[TEST]", pc.magenta, console.info, "Index creation test passed\n")
+    } catch (error) {
+        logger("[TEST]", pc.red, console.error, "Index creation test failed\n")
+    }
+}
+
+function searchWithIndexTest() {
+    try {
+        searchWithIndex("users", "name", "Zyad");
+        searchWithIndex("users", "age", 19);
+        logger("[TEST]", pc.magenta, console.info, "Index search test passed\n")
+    } catch (error) {
+        logger("[TEST]", pc.red, console.error, "Index search test failed\n")
+    }
+}
+
 function main() {
     createTableTest();
     insertIntoTest();
     selectTest();
+    createIndexTest();
+    searchWithIndexTest();
 }
 
 main();
