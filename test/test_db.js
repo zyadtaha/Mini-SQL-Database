@@ -2,6 +2,7 @@ import pc from "picocolors";
 import { createTable, insertInto, select } from "../lib/query.js";
 import { createIndex, searchWithIndex } from "../lib/indexing.js";
 import { backupDatabase, restoreDatabase } from "../lib/backup.js";
+import { performWithLock } from "../lib/locks.js";
 import { logger } from "../logger/logger.js";
 
 function createTableTest() {
@@ -80,6 +81,30 @@ function restoreDatabaseTest() {
     }
 }
 
+async function locksTest(){
+    try {
+        const query1 = 'INSERT INTO users (id, name, age) VALUES (15, "Omar", 22)';
+        const query2 = 'INSERT INTO users (id, name, age) VALUES (16, "Ali", 55)';
+
+        const performInsert = (query, taskName) => {
+            performWithLock("users", async () =>{
+                logger("[TEST]", pc.magenta, console.info, `'${taskName}' started\n`)
+                insertInto(query);
+                await new Promise((resolve) => setTimeout(resolve, 5000));
+                logger("[TEST]", pc.magenta, console.info, `'${taskName}' finished\n`)
+            });
+        };
+        const promises = [
+            performInsert(query1, "Task 1"), 
+            performInsert(query2, "Task 2")
+        ];
+        await Promise.allSettled(promises);
+        logger("[TEST]", pc.magenta, console.info, "Locks test passed\n")
+    } catch (error) {
+        logger("[TEST]", pc.magenta, console.error, "Locks test failed\n", error)
+    }
+}
+
 function main() {
     createTableTest();
     insertIntoTest();
@@ -88,6 +113,7 @@ function main() {
     searchWithIndexTest();
     backupDatabaseTest();
     restoreDatabaseTest();
+    locksTest();
 }
 
 main();
