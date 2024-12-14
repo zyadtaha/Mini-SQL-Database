@@ -17,8 +17,8 @@ function createTableTest() {
 
 function insertIntoTest() {
     const query1 = 'INSERT INTO users (id, name, age) VALUES (13, "Zyad", 19)';
-    const query2 = 'INSERT INTO users (id, name, age) VALUES (1, "Mohamed", 55)';
-    const query3 = 'INSERT INTO users (id, name, age) VALUES (2, "Zyad", 106)';
+    const query2 = 'INSERT INTO users (id, name, age) VALUES (1, "Mohamed", 20)';
+    const query3 = 'INSERT INTO users (id, name, age) VALUES (2, "Zyad", 22)';
     const query4 = 'INSERT INTO users (id, name, age) VALUES (99, "Ahmed", 19)';
     try {
         insertInto(query1);
@@ -40,6 +40,30 @@ function selectTest() {
         logger("[TEST]", pc.magenta, console.info, "Selection test passed\n")
     } catch (error) {
         logger("[TEST]", pc.red, console.error, "Selection test failed\n")
+    }
+}
+
+function selectWithWhereTest() {
+    const query1 = "SELECT age, name FROM users WHERE id < 4";
+    const query2 = "SELECT * FROM users WHERE name = 'Ahmed'";
+    try {
+        console.table(select(query1));
+        console.table(select(query2));
+        logger("[TEST]", pc.magenta, console.info, "Selection with Where test passed\n")
+    } catch (error) {
+        logger("[TEST]", pc.red, console.error, "Selection with Where test failed\n")
+    }
+}
+
+function selectWithAggregationsTest() {
+    const query1 = "SELECT AVG(age), AVG(id) FROM users WHERE id < 4";
+    const query2 = "SELECT COUNT(id) FROM users WHERE name = 'Ahmed'";
+    try {
+        console.table(select(query1));
+        console.table(select(query2));
+        logger("[TEST]", pc.magenta, console.info, "Selection with Aggregations test passed\n")
+    } catch (error) {
+        logger("[TEST]", pc.red, console.error, "Selection with Aggregations test failed\n")
     }
 }
 
@@ -105,15 +129,17 @@ async function locksTest(){
     }
 }
 
-function main() {
+async function main() {
     createTableTest();
     insertIntoTest();
     selectTest();
+    selectWithWhereTest();
+    selectWithAggregationsTest();
     createIndexTest();
     searchWithIndexTest();
     backupDatabaseTest();
     restoreDatabaseTest();
-    locksTest();
+    await locksTest();
 }
 
 main();
